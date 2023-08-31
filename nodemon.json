@@ -1,0 +1,12 @@
+{
+    "ignore": [
+        ".git",
+        "node_modules",
+        ".build"
+    ],
+    "watch": [
+        "./"
+    ],
+    "exec": "ts-node server.ts",
+    "ext": "ts"
+}

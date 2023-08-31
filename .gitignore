@@ -1,0 +1,19 @@
+# IDE
+/.vscode
+
+# environment variable
+.env
+
+# dependency
+node_modules/
+yarn.lock
+yarn-error.log
+
+# storage
+storage/
+
+# build
+.build
+
+#trash
+.trash
