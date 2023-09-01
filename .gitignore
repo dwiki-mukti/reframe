@@ -1,8 +1,12 @@
 # IDE
 /.vscode
+/.idea
 
 # environment variable
 .env
+.env.development
+.env.production
+.env.backup
 
 # dependency
 node_modules/
