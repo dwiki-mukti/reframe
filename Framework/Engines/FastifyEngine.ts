@@ -26,9 +26,52 @@ server.decorateRequest('auth', null)
 
 
 /**
+ * Validator
+ */
+function validator(validations_: Record<string, any>) {
+    const data = {
+        username: 'dwiki@email.com',
+        password: 'pass',
+        phone: ['0852282828', '08182883445'],
+        absensi: {
+            2121212: 'H',
+            3212313: 'I',
+            1231321: 'H'
+        },
+        hobies: {
+            sports: ['renang', 'jogging'],
+            arts: []
+        },
+    }
+    const validations = {
+        username: ['string', 'required', 'exists:users,username,$userId'],
+        password: ['string', 'min:18', 'required'],
+        phone: {
+            array: ['required', 'length:5'],
+            valueRule: ['number']
+        },
+        absensi: {
+            object: ['required'],
+            keyRule: ['string'],
+            valueRule: ['number']
+        },
+        hobies: {
+            object: ['required'],
+            keyRule: ['enum:sports,arts'],
+            valueRule: {
+                array: ['required', 'length:3'],
+                valueRule: ['enum:renang,jogging,panahan,basket']
+            }
+        }
+    }
+}
+
+
+
+/**
  * adaptor request
  */
-function ReframeRequest(req: FastifyRequest): IReframeRequest {
+function ReframeRequest(req: FastifyRequest, res: FastifyReply): IReframeRequest {
     return {
         body: req.body,
         params: req.params,
@@ -36,9 +79,7 @@ function ReframeRequest(req: FastifyRequest): IReframeRequest {
         url: req.url,
         query: req.query,
         auth: req.auth,
-        validate: () => {
-            // !!! TODO: make request validator !!!
-        }
+        validate: () => { } //validator
     }
 }
 
@@ -80,21 +121,21 @@ class ReframeInstance {
 
 
     factory(controllers: (new () => any)[]) {
+        /**
+         * Assign props request & reply
+         */
+        this.server.addHook('preHandler', (request, reply, done) => {
+            this.request = ReframeRequest(request, reply)
+            this.response = new ReframeResponse(reply)
+            return done()
+        })
+
+
         for (const Controller of controllers) {
             const instance = new Controller
             const propertyKeys = Reflect.ownKeys(Controller.prototype)
             const prefix: string = Reflect.getMetadata('prefix', instance) ?? ''
             const middlewares: Function[] = Reflect.getMetadata('middlewares', instance)
-
-
-            /**
-             * Assign props request & reply
-             */
-            this.server.addHook('preHandler', (request, reply, done) => {
-                this.request = ReframeRequest(request)
-                this.response = new ReframeResponse(reply)
-                return done()
-            })
 
 
             /**
@@ -123,8 +164,9 @@ class ReframeInstance {
                     /**
                      * Injecting route-handler to app.
                      */
-                    if (path && method && handler) {
+                    if (path && appModule[method] && handler) {
                         appModule[method](path, (request, reply) => {
+
                             return handler({ request: this.request, response: this.response })
                         })
                     }
