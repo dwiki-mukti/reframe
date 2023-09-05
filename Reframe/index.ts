@@ -1,8 +1,13 @@
+import { FastifyRegister } from "fastify";
 import "reflect-metadata";
 
 /**
  * Interface declaration
  */
+export interface IEngineResult {
+    factory: (controllers: (new () => any)[]) => IEngineResult,
+    start: (options: { port: number }) => void,
+}
 export interface IControllerDecorator {
     prefix?: string,
     middlewares?: string[]
@@ -15,7 +20,7 @@ export type IReframeRequest = {
     url: any,
     query: any,
     auth: any,
-    validate: Function
+    validate: any
 }
 type IReframeResponse = {
     json: (data: Record<string, any>) => void
@@ -48,7 +53,7 @@ export const All = (path?: string): MethodDecorator => (HandlerDecorator({ metho
 
 
 /**
- * class decorator Controller
+ * Class decorator Controller
  */
 export function Controller(params?: IControllerDecorator): ClassDecorator {
     return (target) => {
@@ -58,3 +63,16 @@ export function Controller(params?: IControllerDecorator): ClassDecorator {
         }
     }
 }
+
+
+
+
+/**
+ * Core framework
+ */
+class Reframe {
+    engine(coreEngine: any): IEngineResult {
+        return coreEngine as IEngineResult
+    }
+}
+export default (new Reframe)
