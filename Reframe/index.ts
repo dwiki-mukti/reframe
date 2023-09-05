@@ -1,12 +1,15 @@
-import { FastifyRegister } from "fastify";
 import "reflect-metadata";
 
 /**
  * Interface declaration
  */
-export interface IEngineResult {
-    factory: (controllers: (new () => any)[]) => IEngineResult,
+export interface ReframeEngine {
+    module: (controllers: (new () => any)[]) => ReframeEngine,
+    middleware: (middlewareHandlers: IReframeHandler[]) => ReframeEngine,
     start: (options: { port: number }) => void,
+}
+interface ReframeOptions {
+    prefix?: string
 }
 export interface IControllerDecorator {
     prefix?: string,
@@ -17,19 +20,36 @@ export type IReframeRequest = {
     body: any,
     params: any,
     headers: any,
-    url: any,
+    url: string,
     query: any,
     auth: any,
-    validate: any
+    validate: (validations: IReframeValidations, onFailed?: (invalidMessage: Record<string, any[]>) => any) => any,
+    transporter?: any
 }
-type IReframeResponse = {
+export type IReframeResponse = {
     json: (data: Record<string, any>) => void
     status: (status: number) => IReframeResponse
 }
-export type IReframeHandler = {
+export type IReframeHandlerParams = {
     request: IReframeRequest,
     response: IReframeResponse
 }
+export type IReframeHandler = (params?: IReframeHandlerParams) => void
+
+type ISingleValidations = ('required' | 'string' | 'number' | `enum:${string}` | `max:${number}` | `length:${number}`)[]
+export type IDynamicValidations = (
+    ISingleValidations |
+    {
+        object?: ISingleValidations,
+        ruleKey?: ISingleValidations,
+        ruleValue?: IDynamicValidations
+    } |
+    {
+        array?: ISingleValidations,
+        ruleValue?: IDynamicValidations
+    }
+)
+export type IReframeValidations = Record<string, IDynamicValidations>
 
 
 
@@ -71,8 +91,8 @@ export function Controller(params?: IControllerDecorator): ClassDecorator {
  * Core framework
  */
 class Reframe {
-    engine(coreEngine: any): IEngineResult {
-        return coreEngine as IEngineResult
+    engine(coreEngine: any, options?: ReframeOptions): ReframeEngine {
+        return ((options?.prefix) ? coreEngine.prefix(options?.prefix ?? '') : coreEngine) as ReframeEngine
     }
 }
 export default (new Reframe)

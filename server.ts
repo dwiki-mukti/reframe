@@ -1,4 +1,5 @@
 import UserController from "./Controllers/Users/UserController";
+import TestMiddleware from "./Middlewares/TestMiddleware";
 import Reframe from "./Reframe";
 import FastifyEngine from "./Reframe/Engines/FastifyEngine";
 import fastifyCors from "@fastify/cors";
@@ -8,14 +9,17 @@ import fastifyMultipart from "@fastify/multipart";
 
 
 const activeEngine = FastifyEngine
-    // .register(formBodyPlugin) // acc application/x-www-form-urlencoded
-    // .register(fastifyMultipart, { attachFieldsToBody: 'keyValues' }) // acc multipart/form-data
-    // .register(fastifyCors, { origin: "*" }) // acc cors
+    .plugin(formBodyPlugin) // acc application/x-www-form-urlencoded
+    .plugin(fastifyMultipart, { attachFieldsToBody: 'keyValues' }) // acc multipart/form-data
+    .plugin(fastifyCors, { origin: "*" }) // acc cors
 
 
 
-Reframe.engine(activeEngine)
-    .factory([
+Reframe.engine(activeEngine, { prefix: 'v1' })
+    .middleware([
+        TestMiddleware
+    ])
+    .module([
         UserController
     ])
     .start({ port: 8000 })

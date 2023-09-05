@@ -1,9 +1,9 @@
 /**
  * import package
  */
-import fastify, { FastifyRegister, FastifyReply, FastifyRequest } from 'fastify'
-import { IHttpMethod, IReframeHandler, IReframeRequest, IReframeResponse, IReframeValidations } from "@/Reframe"
-import { ReplaceReturnType, isArray, isObject } from '@/Utils'
+import fastify, { FastifyPluginCallback, FastifyRegister, FastifyRegisterOptions, FastifyReply, FastifyRequest } from 'fastify'
+import { IHttpMethod, IReframeRequest } from "@/Reframe"
+import { isArray, isObject } from '@/Utils'
 
 
 
@@ -133,7 +133,7 @@ function subValidator(
     return results
 }
 function validator(req: Record<string, any>, res: FastifyReply) {
-    return async (validations: IReframeValidations, onFailed?: (invalidMessage: Record<string, any[]>) => any) => {
+    return async (validations: Record<string, any>, onFailed?: any) => {
         let dataValidateds: any = {}
         let invalids = {}
 
@@ -168,7 +168,7 @@ function ReframeRequest(req: FastifyRequest, res: FastifyReply): IReframeRequest
         url: req.url,
         query: req.query,
         auth: req.auth,
-        validate: validator(req.body, res),
+        validate: validator(req.body, res)
     }
 }
 
@@ -198,108 +198,76 @@ class ReframeResponse {
  * declare main class
  */
 class FastifyReframer {
+    private server = fastify()
     private request = {}
     private response = {}
-    private server = fastify()
-    private stringPrefix = ''
-    private modules = []
-    private middlewareHandlers: IReframeHandler[] = []
 
 
-    public plugin: ReplaceReturnType<FastifyRegister, this> = (plugin, opts) => {
+    public plugin: FastifyRegister = (plugin, opts) => {
         this.server.register(plugin, opts)
         return this
     }
 
 
-    protected prefix(prefix: string) {
-        this.stringPrefix = prefix
-        return this
-    }
-
-
-    protected middleware(middlewareHandlers: IReframeHandler[]) {
-        this.middlewareHandlers = [...(this.middlewareHandlers), ...middlewareHandlers]
-        return this
-    }
-
-
     protected module(controllers: (new () => any)[]) {
-        this.modules = [...(this.modules), ...controllers]
+        /**
+         * Assign props request & reply
+         */
+        this.server.addHook('preHandler', (request, reply, done) => {
+            this.request = ReframeRequest(request, reply)
+            this.response = new ReframeResponse(reply)
+            return done()
+        })
+
+
+        for (const Controller of controllers) {
+            const instance = new Controller
+            const propertyKeys = Reflect.ownKeys(Controller.prototype)
+            const prefix: string = Reflect.getMetadata('prefix', instance) ?? ''
+            const middlewares: Function[] = Reflect.getMetadata('middlewares', instance)
+
+
+            /**
+             * Register class controller.
+             */
+            this.server.register((appModule, options, doneAppModule) => {
+                /**
+                 * Inject middleware to app.
+                 */
+                for (const middleware of (middlewares ?? [])) {
+                    appModule.addHook('preHandler', (request, reply, doneMiddleware) => {
+                        middleware({ request: this.request, response: this.response })
+                        return doneMiddleware()
+                    })
+                }
+
+
+                /**
+                 * Inject route-handler to app.
+                 */
+                for (const propertyKey of propertyKeys) {
+                    const path: string = Reflect.getMetadata('path', instance, propertyKey)
+                    const method: IHttpMethod = Reflect.getMetadata('method', instance, propertyKey)
+                    const handler = instance[propertyKey]
+
+                    /**
+                     * Injecting route-handler to app.
+                     */
+                    if (path && appModule[method] && handler) {
+                        appModule[method](path, (request, reply) => {
+
+                            return handler({ request: this.request, response: this.response })
+                        })
+                    }
+                }
+                return doneAppModule()
+            }, { prefix })
+        }
         return this
     }
 
 
     protected start(params?: { port?: number }) {
-        this.server.register((serverApp, serverOptions, serverDone) => {
-            serverApp.addHook('preHandler', (request, reply, reframeHttpDone) => {
-                // Reframing http request & response
-                this.request = ReframeRequest(request, reply)
-                this.response = new ReframeResponse(reply)
-
-                // Inject middleware
-                for (const middleware of this.middlewareHandlers) {
-                    middleware({ request: (this.request as IReframeRequest), response: (this.response as IReframeResponse) })
-                }
-
-                return reframeHttpDone()
-            })
-
-
-
-            /**
-             * Inject module
-             */
-            for (const Controller of this.modules) {
-                const instance = new Controller
-                const propertyKeys = Reflect.ownKeys(Controller.prototype)
-                const prefix: string = Reflect.getMetadata('prefix', instance) ?? ''
-                const middlewares: Function[] = Reflect.getMetadata('middlewares', instance)
-
-
-                /**
-                 * Injecting module
-                 */
-                serverApp.register((moduleApp, moduleOptions, doneModule) => {
-                    /**
-                     * Inject middleware module.
-                     */
-                    for (const middleware of (middlewares ?? [])) {
-                        moduleApp.addHook('preHandler', (req, rep, doneMiddleware) => {
-                            middleware({ request: this.request, response: this.response })
-                            return doneMiddleware()
-                        })
-                    }
-
-
-                    /**
-                     * Inject handler module.
-                     */
-                    for (const propertyKey of propertyKeys) {
-                        const path: string = Reflect.getMetadata('path', instance, propertyKey)
-                        const method: IHttpMethod = Reflect.getMetadata('method', instance, propertyKey)
-                        const handler = instance[propertyKey]
-
-                        /**
-                         * Injecting route-handler to app.
-                         */
-                        if (path && moduleApp[method] && handler) {
-                            moduleApp[method](path, (request, reply) => {
-                                return handler({ request: this.request, response: this.response })
-                            })
-                        }
-                    }
-                    return doneModule()
-                }, { prefix })
-            }
-
-            serverDone()
-        }, { prefix: this.stringPrefix })
-
-
-        /**
-         * start server
-         */
         this.server.listen({
             port: params?.port ?? 8000
         }, (err, address) => {

@@ -1,8 +1,8 @@
 /**
  * import package
  */
-import fastify, { FastifyRegister, FastifyReply, FastifyRequest } from 'fastify'
-import { IHttpMethod, IReframeHandler, IReframeRequest, IReframeResponse, IReframeValidations } from "@/Reframe"
+import fastify, { FastifyPluginCallback, FastifyRegister, FastifyRegisterOptions, FastifyReply, FastifyRequest } from 'fastify'
+import { IHttpMethod, IReframeRequest } from "@/Reframe"
 import { ReplaceReturnType, isArray, isObject } from '@/Utils'
 
 
@@ -133,7 +133,7 @@ function subValidator(
     return results
 }
 function validator(req: Record<string, any>, res: FastifyReply) {
-    return async (validations: IReframeValidations, onFailed?: (invalidMessage: Record<string, any[]>) => any) => {
+    return async (validations: Record<string, any>, onFailed?: any) => {
         let dataValidateds: any = {}
         let invalids = {}
 
@@ -168,7 +168,7 @@ function ReframeRequest(req: FastifyRequest, res: FastifyReply): IReframeRequest
         url: req.url,
         query: req.query,
         auth: req.auth,
-        validate: validator(req.body, res),
+        validate: validator(req.body, res)
     }
 }
 
@@ -198,12 +198,10 @@ class ReframeResponse {
  * declare main class
  */
 class FastifyReframer {
+    private server = fastify()
     private request = {}
     private response = {}
-    private server = fastify()
     private stringPrefix = ''
-    private modules = []
-    private middlewareHandlers: IReframeHandler[] = []
 
 
     public plugin: ReplaceReturnType<FastifyRegister, this> = (plugin, opts) => {
@@ -218,39 +216,20 @@ class FastifyReframer {
     }
 
 
-    protected middleware(middlewareHandlers: IReframeHandler[]) {
-        this.middlewareHandlers = [...(this.middlewareHandlers), ...middlewareHandlers]
-        return this
-    }
-
-
     protected module(controllers: (new () => any)[]) {
-        this.modules = [...(this.modules), ...controllers]
-        return this
-    }
-
-
-    protected start(params?: { port?: number }) {
-        this.server.register((serverApp, serverOptions, serverDone) => {
-            serverApp.addHook('preHandler', (request, reply, reframeHttpDone) => {
-                // Reframing http request & response
+        // here global middleware
+        this.server.register((app, opts, done) => {
+            /**
+             * Reframing request & response
+             */
+            app.addHook('preHandler', (request, reply, done) => {
                 this.request = ReframeRequest(request, reply)
                 this.response = new ReframeResponse(reply)
-
-                // Inject middleware
-                for (const middleware of this.middlewareHandlers) {
-                    middleware({ request: (this.request as IReframeRequest), response: (this.response as IReframeResponse) })
-                }
-
-                return reframeHttpDone()
+                return done()
             })
 
 
-
-            /**
-             * Inject module
-             */
-            for (const Controller of this.modules) {
+            for (const Controller of controllers) {
                 const instance = new Controller
                 const propertyKeys = Reflect.ownKeys(Controller.prototype)
                 const prefix: string = Reflect.getMetadata('prefix', instance) ?? ''
@@ -258,14 +237,14 @@ class FastifyReframer {
 
 
                 /**
-                 * Injecting module
+                 * Register class controller.
                  */
-                serverApp.register((moduleApp, moduleOptions, doneModule) => {
+                app.register((appModule, options, doneAppModule) => {
                     /**
-                     * Inject middleware module.
+                     * Inject middleware to app.
                      */
                     for (const middleware of (middlewares ?? [])) {
-                        moduleApp.addHook('preHandler', (req, rep, doneMiddleware) => {
+                        appModule.addHook('preHandler', (request, reply, doneMiddleware) => {
                             middleware({ request: this.request, response: this.response })
                             return doneMiddleware()
                         })
@@ -273,7 +252,7 @@ class FastifyReframer {
 
 
                     /**
-                     * Inject handler module.
+                     * Inject route-handler to app.
                      */
                     for (const propertyKey of propertyKeys) {
                         const path: string = Reflect.getMetadata('path', instance, propertyKey)
@@ -283,23 +262,25 @@ class FastifyReframer {
                         /**
                          * Injecting route-handler to app.
                          */
-                        if (path && moduleApp[method] && handler) {
-                            moduleApp[method](path, (request, reply) => {
+                        if (path && appModule[method] && handler) {
+                            appModule[method](path, (request, reply) => {
+
                                 return handler({ request: this.request, response: this.response })
                             })
                         }
                     }
-                    return doneModule()
+                    return doneAppModule()
                 }, { prefix })
             }
 
-            serverDone()
+
+            return done()
         }, { prefix: this.stringPrefix })
+        return this
+    }
 
 
-        /**
-         * start server
-         */
+    protected start(params?: { port?: number }) {
         this.server.listen({
             port: params?.port ?? 8000
         }, (err, address) => {

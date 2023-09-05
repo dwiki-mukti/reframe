@@ -1,15 +1,22 @@
-import { Controller, Get, IReframeHandler, Post } from "@/Reframe";
+import { Controller, Get, IReframeHandlerParams, Post } from "@/Reframe";
 
 
 @Controller()
 export default class UserController {
+    @Get()
+    async index({ response }: IReframeHandlerParams) {
+        return response.json({
+            ping: 'pong'
+        })
+    }
+
     @Post()
-    async index({ request, response }: IReframeHandler) {
+    async store({ request, response }: IReframeHandlerParams) {
 
         const validated = await request.validate({
             username: ['string', 'required'], // example single field
             phone: { // example array
-                array: ['required', 'length:5'],
+                array: ['required', 'length:3'],
                 ruleValue: ['number']
             },
             absensi: { // example object
