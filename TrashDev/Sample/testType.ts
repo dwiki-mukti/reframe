@@ -67,22 +67,29 @@ const makhlukHidup: hidup = {
 
 
 
-type DynamicMe =
+type ISingleValidations = ('required' | 'string' | 'number' | `enum:${string}` | `max:${number}` | `length:${number}`)[]
+export type IDynamicValidations = (
+  ISingleValidations |
   {
-    object: string,
-    ruleKey?: string,
-    ruleValue?: string
+    type: 'structure',
+    rule?: ISingleValidations,
+    structure?: Record<string, IDynamicValidations>,
+  } |
+  {
+    type: 'object',
+    rule?: ISingleValidations,
+    ruleKey?: ISingleValidations,
+    ruleValue?: IDynamicValidations
+  } |
+  {
+    type: 'array',
+    rule?: ISingleValidations,
+    ruleValue?: IDynamicValidations
   }
-  | {
-    array: string,
-    ruleValue?: string
-  }
-// | {
-//   object: string,
-//   structure?: string
-// }
+)
 
-const you: DynamicMe = {
-  array: '',
-  
+const me: IDynamicValidations = {
+  type: 'object',
+  rule: ['number'],
+  ruleKey: ['number']
 }

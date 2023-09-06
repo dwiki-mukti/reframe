@@ -4,16 +4,16 @@ type ISingleValidations = ('required' | 'string' | 'number' | `enum:${string}` |
 export type IDynamicValidations = (
     ISingleValidations |
     {
-        object?: ISingleValidations,
+        object: ISingleValidations,
         ruleKey?: ISingleValidations,
         ruleValue?: IDynamicValidations
     } |
     {
-        object?: ISingleValidations,
+        object: ISingleValidations,
         structure?: Record<string, IDynamicValidations>,
     } |
     {
-        array?: ISingleValidations,
+        array: ISingleValidations,
         ruleValue?: IDynamicValidations
     }
 )
@@ -60,7 +60,7 @@ const subValidator: ISubValidator = function ({
         } else {
             if (rule.structure) {
                 const validateStructure = validator({
-                    request: request[fieldName],
+                    request: request,
                     validations: rule.structure,
                     mutator: { prefixKey: fieldName }
                 })
@@ -85,7 +85,7 @@ const subValidator: ISubValidator = function ({
                     const validateValue = subValidator({
                         fieldName: currentFieldName,
                         request: valueObject,
-                        rule: rule.ruleKey,
+                        rule: rule.ruleValue,
                         mutator: { prefixValue: 'value object' }
                     })
 
@@ -204,5 +204,5 @@ export const validator: IValidator = function ({
     }
 
     // Returning data
-    return Object.keys(invalidResult).length ? invalidResult : dataResult
+    return Object.keys(invalidResult).length ? { invalids: invalidResult } : { data: dataResult }
 }

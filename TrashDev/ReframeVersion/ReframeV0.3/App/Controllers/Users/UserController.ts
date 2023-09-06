@@ -16,43 +16,35 @@ export default class UserController {
         const validated = await request.validate({
             username: ['string', 'required'], // example single field
             phone: { // example array
-                type: 'array',
-                rule: ['number'],
-                ruleValue: ['number'],
+                array: ['required', 'length:3'],
+                ruleValue: ['number']
             },
             absensi: { // example object
-                type: 'object',
-                rule: ['required'],
+                object: ['required'],
                 ruleKey: ['number'],
                 ruleValue: ['string']
             },
             hobies: { // example object-array
-                type: 'object',
-                rule: ['required'],
+                object: ['required'],
                 ruleKey: ['enum:sports,arts'],
                 ruleValue: {
-                    type: 'array',
-                    rule: ['required', 'length:3'],
+                    array: ['required', 'length:3'],
                     ruleValue: ['string']
                 }
             },
             sample_object_object: { // example object-object
-                type: 'object',
-                rule: ['required'],
+                object: ['required'],
                 ruleKey: ['string'],
                 ruleValue: {
-                    type: 'object',
-                    rule: ['required'],
+                    object: ['required'],
                     ruleKey: ['string'],
                     ruleValue: ['number']
                 }
             },
             object_structure: {
-                type: 'array',
-                rule: ['required'],
+                array: ['required'],
                 ruleValue: {
-                    type: 'structure',
-                    rule: ['required'],
+                    object: ['required'],
                     structure: {
                         idUser: ['number'],
                         statusAbsensi: ['number']

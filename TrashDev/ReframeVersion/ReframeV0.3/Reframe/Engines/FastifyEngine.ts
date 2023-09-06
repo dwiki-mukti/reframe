@@ -4,7 +4,7 @@
 import fastify, { FastifyRegister, FastifyReply, FastifyRequest } from 'fastify'
 import { IHttpMethod, IReframeHandler, IReframeRequest, IReframeResponse } from "@/Reframe"
 import { ReplaceReturnType } from '@/Utils'
-import { IValidations, validator } from '../validator'
+import { IDynamicValidations, validator } from '../validator'
 
 
 
@@ -39,7 +39,7 @@ function ReframeRequest(req: FastifyRequest, res: FastifyReply): IReframeRequest
         query: req.query,
         auth: req.auth,
         validate: (
-            validations: Record<string, IValidations>,
+            validations: Record<string, IDynamicValidations>,
             onInvalid?: (invalidMessage: Record<string, any[]>) => any
         ) => {
             const { invalids, data } = validator({ request: req.body, validations })
