@@ -1,5 +1,5 @@
-import UserController from "./Controllers/Users/UserController";
-import TestMiddleware from "./Middlewares/TestMiddleware";
+import UserController from "./App/Controllers/Users/UserController";
+import TestMiddleware from "./App/Middlewares/TestMiddleware";
 import Reframe from "./Reframe";
 import FastifyEngine from "./Reframe/Engines/FastifyEngine";
 import fastifyCors from "@fastify/cors";

@@ -1,6 +1,5 @@
-import { isArray, isObject } from "@/Utils";
+
 import "reflect-metadata";
-import { IReframeValidations } from "./validator";
 
 /**
  * Interface declaration
@@ -25,7 +24,11 @@ export type IReframeRequest = {
     url: string,
     query: any,
     auth: any,
-    validate: (validations: IReframeValidations, onFailed?: (invalidMessage: Record<string, any[]>) => any) => any,
+    /**
+     * !!! HERE !!!
+     */
+    // validate: (validations: IReframeValidations, onFailed?: (invalidMessage: Record<string, any[]>) => any) => any,
+    validate: any,
     transporter?: any
 }
 export type IReframeResponse = {
@@ -37,6 +40,23 @@ export type IReframeHandlerParams = {
     response: IReframeResponse
 }
 export type IReframeHandler = (params?: IReframeHandlerParams) => void
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -37,8 +37,18 @@ export default class UserController {
                 ruleKey: ['string'],
                 ruleValue: {
                     object: ['required'],
-                    ruleKey: ['number'],
+                    ruleKey: ['string'],
                     ruleValue: ['number']
+                }
+            },
+            object_structure: {
+                array: ['required'],
+                ruleValue: {
+                    object: ['required'],
+                    structure: {
+                        idUser: ['number'],
+                        statusAbsensi: ['number']
+                    }
                 }
             }
         })
