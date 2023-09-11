@@ -2,17 +2,23 @@
   "scripts": {
     "dev": "nodemon",
     "build": "tsc && tsc-alias",
-    "start": "node .build/server.js"
+    "start": "node .build/server.js",
+    "migrate": "npx ts-node App/Database/Migrator.ts"
   },
   "dependencies": {
     "@fastify/cors": "^8.3.0",
     "@fastify/formbody": "^7.4.0",
     "@fastify/multipart": "^7.7.3",
+    "commander": "^11.0.0",
+    "dotenv": "^16.3.1",
     "fastify": "^4.22.0",
+    "kysely": "^0.26.3",
+    "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/node": "^20.5.7",
+    "@types/pg": "^8.10.2",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
     "tsc-alias": "^1.8.7",
