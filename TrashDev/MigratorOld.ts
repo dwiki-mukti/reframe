@@ -39,7 +39,7 @@
 //     process.exit(1)
 //   }
 
-//   await db.destroy()
+//   await DB.destroy()
 // }
 
 // migrateToLatest()
@@ -54,7 +54,6 @@
  */
 
 import * as path from 'path'
-import { db } from "./connection";
 import { promises as fs, lstatSync, mkdirSync, writeFileSync } from 'fs'
 import {
   Migrator,
@@ -63,9 +62,10 @@ import {
   NO_MIGRATIONS,
 } from 'kysely'
 import { program } from 'commander'
+import DB from '../App/Database/DB'
 
 
-function showResults({error, results} : MigrationResultSet) {
+function showResults({ error, results }: MigrationResultSet) {
   if (results) {
     results?.forEach((it) => {
       if (it.status === 'Success') {
@@ -84,7 +84,7 @@ function showResults({error, results} : MigrationResultSet) {
 }
 
 const migrator = new Migrator({
-  db,
+  db: DB,
   provider: new FileMigrationProvider({
     fs,
     path,
@@ -104,7 +104,7 @@ export async function down(db: Kysely<any>): Promise<void> {
 }
 `
 
-async function run( pathFolder: string = path.join(__dirname, './Migrations') ) {
+async function run(pathFolder: string = path.join(__dirname, './Migrations')) {
   program
     .command('up')
     .description('Run a pending migration if any')
@@ -185,7 +185,7 @@ async function run( pathFolder: string = path.join(__dirname, './Migrations') ) 
       console.log('Created Migration:', fileName)
     })
 
-  program.parseAsync().then(() => db.destroy())
+  program.parseAsync().then(() => DB.destroy())
 }
 
 run()

@@ -3,7 +3,7 @@
     "dev": "nodemon",
     "build": "tsc && tsc-alias",
     "start": "node .build/server.js",
-    "migrate": "npx ts-node App/Database/Migrator.ts"
+    "migrate": "npx ts-node App/Database/Migrations"
   },
   "dependencies": {
     "@fastify/cors": "^8.3.0",

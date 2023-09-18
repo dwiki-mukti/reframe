@@ -1,17 +1,26 @@
+{
+    CLI: {
+        on make migration: [
+            add boilerplate migration,
+            add schema
+        ],
+        reframe make module: [
+            controller,
+            service
+        ]
+    },
+    add validator: [
+        nullable,
+        enum:opts1,opts2,
 
+        min,
+        max,
+        length,
 
-# Task
-- add orm db connection
+        exist:column,table,
+        unique:column,table,except,
 
-- add validator nullable
-- add validator enum:opts1,opts2
-
-- add validator min
-- add validator max
-- add validator length
-
-- add validator exist:column,table
-- add validator unique:column,table,except
-
-- add validator extnames:docs,txt
-- add validator maxsize:2mb
+        extnames:docs,txt,
+        maxsize:2mb
+    ]
+}

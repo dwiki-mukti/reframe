@@ -9,7 +9,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "ES2022",
-    "outDir": "./dist",
+    "outDir": "./.build",
     "baseUrl": ".",
     "incremental": true,
     "skipLibCheck": true,
@@ -20,5 +20,5 @@
     }
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "TrashDev/**"]
 }
