@@ -39,22 +39,47 @@ const migrator = new Migrator({
     fs,
     path,
     // This needs to be an absolute path.
-    migrationFolder: path.join(__dirname, './Migrations'),
+    migrationFolder: path.join(__dirname),
   }),
 })
 
-const TEMPLATE = `import { Kysely } from 'kysely'
+function templateMigration(name:string) {
+  
+  const TEMPLATE = `import { Kysely, sql } from 'kysely'
 
 export async function up(db: Kysely<any>): Promise<void> {
-
+  await db.schema
+  .createTable('${name}')
+  .addColumn('id', 'serial', (col) => col.primaryKey())
+  .execute()
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-
+  await db.schema.dropTable('${name}').execute()
 }
-`
+  `
+  
+  return TEMPLATE
+}
 
-async function run(pathFolder: string = path.join(__dirname, './Migrations')) {
+function templateInterface(name:string) {
+  
+  const TEMPLATE = `import { ColumnType, Generated, Insertable, Selectable, Updateable } from "kysely"
+  
+export interface ${name}Table {
+  id: Generated<number>
+}
+
+export type ${name} = Selectable<${name}Table>
+export type New${name} = Insertable<${name}Table>
+export type ${name}Update = Updateable<${name}Table>
+    
+  `
+  
+  return TEMPLATE
+}
+
+async function run(pathFolder: string = path.join(__dirname)) {
   program
     .command('up')
     .description('Run a pending migration if any')
@@ -114,10 +139,16 @@ async function run(pathFolder: string = path.join(__dirname, './Migrations')) {
   program
     .command('create')
     .argument('<input-file>')
+    .option('-i, --interface', 'Create a new interface file from new migration')
     .description(
       'Create a new migration with the given description, and the current time as the version',
     )
-    .action(async (name) => {
+    .action(async (name, options) => {
+      
+      /**
+       * 
+       * Create File Migration
+       */
       const dateStr = Date.now()
       const fileName = `${pathFolder}/${dateStr}_${name}.ts`
       const mkdir = () => mkdirSync(`${pathFolder}`)
@@ -128,8 +159,28 @@ async function run(pathFolder: string = path.join(__dirname, './Migrations')) {
       } catch {
         mkdirSync(`${pathFolder}`)
       }
-      writeFileSync(fileName, TEMPLATE, 'utf8')
+      writeFileSync(fileName, templateMigration(name), 'utf8')
       console.log('Created Migration:', fileName)
+      
+      
+      /**
+       * 
+       * Create File Interface
+       */
+      if(options.interface){
+        const rename = name.replace(/^./, name[0].toUpperCase())
+        const fileName = `${pathFolder}/../Schema/I${rename}Table.ts`
+        const mkdir = () => mkdirSync(`${pathFolder}/../Schema`)
+        try {
+          if (!lstatSync(`${pathFolder}/../Schema`).isDirectory()) {
+            mkdir()
+          }
+        } catch {
+          mkdirSync(`${pathFolder}/../Schema`)
+        }
+        writeFileSync(fileName, templateInterface(rename), 'utf8')
+        console.log('Created Interface:', fileName)
+      }
     })
 
   program.parseAsync().then(() => DB.destroy())
