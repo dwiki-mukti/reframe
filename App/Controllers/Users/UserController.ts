@@ -1,10 +1,17 @@
 
 import DB from "@/App/Database/DB";
-import { Controller, Get, IReframeHandlerParams, Post } from "@/Reframe";
+import { Controller, Get, IReframeHandlerParams, Post } from "@/Reframe/decorator";
 
 
-@Controller()
-export default class UserController {
+@Controller({
+    prefix: 'user',
+    middlewares: [
+        ({ request, response }) => {
+            console.log('Test middleware on controller!');
+        }
+    ]
+})
+class UserController {
     @Get()
     async index({ response }: IReframeHandlerParams) {
         return response.json({
@@ -70,12 +77,13 @@ export default class UserController {
     @Get('/person')
     async person({ response }: IReframeHandlerParams) {
         const result = await DB.selectFrom('person')
-                        .innerJoin('pet', 'pet.owner_id', 'person.id')
-                        .select(['person.first_name as Nama Pemilik','pet.name as Pet', 'pet.species as Spesies'])
-                        .execute();
+            .innerJoin('pet', 'pet.owner_id', 'person.id')
+            .select(['person.first_name as Nama Pemilik', 'pet.name as Pet', 'pet.species as Spesies'])
+            .execute();
 
         return response.json({
             data: result
         })
     }
 }
+export default UserController

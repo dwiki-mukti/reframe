@@ -1,6 +1,6 @@
-import { IReframeHandlerParams } from "@/Reframe";
+import { IReframeHandlerParams } from "@/Reframe/decorator";
 
 
 export default ({ request, response }: IReframeHandlerParams) => {
-    console.log('middleware called!');
+    console.log('Test Global middleware!');
 }
