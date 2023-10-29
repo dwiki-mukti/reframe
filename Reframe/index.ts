@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { IReframeHandler } from "./decorator";
+import { IReframeHandler } from "@/reframe/providers/decorator";
 
 /**
  * Interface declaration

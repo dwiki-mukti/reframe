@@ -1,7 +1,7 @@
-import UserController from "./App/Controllers/Users/UserController";
-import TestMiddleware from "./App/Middlewares/TestMiddleware";
+import UserController from "./app/Controllers/Users/UserController";
+import TestMiddleware from "./app/Middlewares/TestMiddleware";
 import Reframe from "./Reframe";
-import FastifyEngine from "./Reframe/Engines/FastifyEngine";
+import FastifyEngine from "./reframe/engines/fastify";
 
 
 Reframe.middleware([

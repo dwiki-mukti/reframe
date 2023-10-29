@@ -1,4 +1,4 @@
-import { IReframeResponse } from "@/Reframe/decorator"
+import { IReframeResponse } from "@/Reframe/providers/decorator"
 import { FastifyReply } from "fastify"
 
 

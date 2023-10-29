@@ -2,9 +2,7 @@
   "scripts": {
     "dev": "nodemon",
     "build": "tsc && tsc-alias",
-    "start": "node .build/server.js",
-    "migrate": "npx ts-node -- App/Database/Migrations",
-    "reframe": "npx ts-node Reframe/CLI.ts"
+    "start": "node .build/server.js"
   },
   "dependencies": {
     "@fastify/cors": "^8.3.0",

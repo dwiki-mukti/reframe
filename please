@@ -1,0 +1,9 @@
+const promptLoader = require("./reframe/providers/prompts/index");
+
+
+promptLoader.default()
+
+/**
+ * Current command => npx ts-node please make:something
+ * Expected command => node please make:something
+ */

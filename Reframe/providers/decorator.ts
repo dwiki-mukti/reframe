@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { IHttpMethod } from ".";
+import { IHttpMethod } from "..";
 import { IReframeValidations } from "./validator";
 
 /**

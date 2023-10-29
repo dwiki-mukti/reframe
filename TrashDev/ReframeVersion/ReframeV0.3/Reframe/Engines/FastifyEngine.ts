@@ -3,7 +3,7 @@
  */
 import fastify, { FastifyRegister, FastifyReply, FastifyRequest } from 'fastify'
 import { IHttpMethod, IReframeHandler, IReframeRequest, IReframeResponse } from "@/Reframe"
-import { ReplaceReturnType } from '@/Utils'
+import { ReplaceReturnType } from '@/utils'
 import { IDynamicValidations, validator } from '../validator'
 
 

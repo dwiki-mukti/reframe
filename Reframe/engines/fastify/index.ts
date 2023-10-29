@@ -2,8 +2,8 @@
  * import package
  */
 import fastify from 'fastify'
-import { IMetaReframe, IOptionStartEngine } from "@/Reframe"
-import { IReframeRequest, IReframeResponse } from '../../decorator'
+import { IMetaReframe, IOptionStartEngine } from "@/reframe"
+import { IReframeRequest, IReframeResponse } from '@/reframe/providers/decorator'
 import reframeRequest from './reframeRequest'
 import reframeResponse from './reframeResponse'
 

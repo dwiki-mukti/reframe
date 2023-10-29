@@ -62,7 +62,7 @@ import {
   NO_MIGRATIONS,
 } from 'kysely'
 import { program } from 'commander'
-import DB from '../App/Database/DB'
+import DB from '../app/Database/DB'
 
 
 function showResults({ error, results }: MigrationResultSet) {

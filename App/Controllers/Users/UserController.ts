@@ -1,6 +1,6 @@
 
-import DB from "@/App/Database/DB";
-import { Controller, Get, IReframeHandlerParams, Post } from "@/Reframe/decorator";
+import DB from "@/app/Database/DB";
+import { Controller, Get, IReframeHandlerParams, Post } from "@/Reframe/providers/decorator";
 
 
 @Controller({
@@ -15,7 +15,8 @@ class UserController {
     @Get()
     async index({ response }: IReframeHandlerParams) {
         return response.json({
-            ping: 'pong'
+            data: {},
+            message: 'Success!'
         })
     }
 

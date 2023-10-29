@@ -1,4 +1,4 @@
-import { isArray, isObject } from "@/Utils";
+import { isArray, isObject } from "@/utils";
 import "reflect-metadata";
 import { IReframeValidations } from "./validator";
 

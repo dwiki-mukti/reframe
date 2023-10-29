@@ -3,7 +3,7 @@
  */
 import fastify, { FastifyRegister, FastifyReply, FastifyRequest } from 'fastify'
 import { IHttpMethod, IReframeRequest } from "@/Reframe"
-import { ReplaceReturnType, isArray, isObject } from '@/Utils'
+import { ReplaceReturnType, isArray, isObject } from '@/utils'
 
 
 

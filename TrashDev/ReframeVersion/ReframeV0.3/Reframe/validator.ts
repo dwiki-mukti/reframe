@@ -1,4 +1,4 @@
-import { isArray, isObject } from "@/Utils";
+import { isArray, isObject } from "@/utils";
 
 type ISingleValidations = ('required' | 'string' | 'number' | `enum:${string}` | `max:${number}` | `length:${number}`)[]
 export type IDynamicValidations = (

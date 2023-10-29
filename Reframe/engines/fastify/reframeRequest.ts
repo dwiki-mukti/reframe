@@ -1,5 +1,5 @@
-import { IReframeRequest } from "@/Reframe/decorator"
-import { IValidations, validator } from "@/Reframe/validator"
+import { IReframeRequest } from "@/Reframe/providers/decorator"
+import { IValidations, validator } from "@/Reframe/providers/validator"
 import { FastifyReply, FastifyRequest } from "fastify"
 
 /**

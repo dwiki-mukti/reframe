@@ -1,4 +1,4 @@
-import { IReframeHandlerParams } from "@/Reframe/decorator";
+import { IReframeHandlerParams } from "@/Reframe/providers/decorator";
 
 
 export default ({ request, response }: IReframeHandlerParams) => {

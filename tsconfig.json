@@ -20,5 +20,5 @@
     }
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", "TrashDev/**"]
+  "exclude": ["node_modules", "trashDev/**"]
 }
