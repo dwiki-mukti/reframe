@@ -1,5 +1,5 @@
 
-import DB from "@/app/Database/DB";
+import DB from "@/app/Databases/DB";
 import { Controller, Get, IReframeHandlerParams, Post } from "@/Reframe/providers/decorator";
 
 
