@@ -1,6 +1,6 @@
 import { IMetaReframe, IOptionStartEngine } from "@/Reframe";
 
-export default function (meta: IMetaReframe, options: IOptionStartEngine) {
+export default function SampleEngine(meta: IMetaReframe, options: IOptionStartEngine) {
     console.log({
         meta,
         options

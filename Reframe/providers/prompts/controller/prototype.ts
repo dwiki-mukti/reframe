@@ -3,9 +3,9 @@ import { Controller, Get, IReframeHandlerParams, Post } from "@/Reframe/provider
 
 
 @Controller({
-    prefix: '${route}'
+    prefix: 'NameRoute'
 })
-class $ { name }Controller {
+class NameController {
     @Get('/')
     async index({ response }: IReframeHandlerParams) {
 
@@ -97,7 +97,7 @@ class $ { name }Controller {
 
 
     @Post('/:id')
-    async delete ({ request, response }: IReframeHandlerParams) {
+    async delete({ request, response }: IReframeHandlerParams) {
         /**
          * Check Exist data
          */
@@ -113,4 +113,4 @@ class $ { name }Controller {
         })
     }
 }
-export default UserController
+export default NameController

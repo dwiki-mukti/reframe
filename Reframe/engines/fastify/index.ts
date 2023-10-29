@@ -24,7 +24,7 @@ server.decorateRequest('auth', null)
 /**
  * declare main class
  */
-class FastifyEngine {
+class Engine {
     private request: IReframeRequest
     private response: IReframeResponse
     private server = server
@@ -99,6 +99,6 @@ class FastifyEngine {
         })
     }
 }
-export default function (meta: IMetaReframe, options: IOptionStartEngine) {
-    return new FastifyEngine(meta, options)
+export default function FastifyEngine(meta: IMetaReframe, options: IOptionStartEngine) {
+    return new Engine(meta, options)
 }
