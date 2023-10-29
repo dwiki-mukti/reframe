@@ -38,6 +38,9 @@ class Engine {
 
 
     protected start(options: IOptionStartEngine) {
+        /**
+         * Setup var
+         */
         this.server.register((serverApp, serverOptions, serverDone) => {
             /**
              * Inject global middleware
@@ -73,16 +76,16 @@ class Engine {
                      * Inject route handler.
                      */
                     for (const routeHandler of (controller.routeHandlers ?? [])) {
-                        moduleApp[routeHandler.htttpMethod ?? 'get'](routeHandler.route ?? '/', (request, reply) => {
-                            return routeHandler.handler({ request: this.request, response: this.response })
-                        })
+                        moduleApp[routeHandler.htttpMethod ?? 'get'](routeHandler.route.replace(/\/+$/, ''),
+                            () => routeHandler.handler({ request: this.request, response: this.response })
+                        )
                     }
                     return doneModule()
-                }, { prefix: controller?.prefix ?? '' })
+                })
             }
 
             serverDone()
-        }, { prefix: options?.prefix ?? '' })
+        })
 
 
         /**

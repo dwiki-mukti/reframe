@@ -34,62 +34,72 @@ export interface IOptionStartEngine {
  */
 const htttpMethodAlloweds = ['get', 'post', 'put', 'patch', 'delete', 'all']
 class Reframe {
-    private meta: IMetaReframe = {
-        plugins: [],
-        middlewares: [],
-        controllers: []
-    }
+    private plugins = [];
+    private middlewares = [];
+    private controllers = [];
+
 
 
     public plugin = (plugin: any, opts?: any) => {
-        this.meta.plugins = this.meta.plugins.concat({ plugin, opts })
+        this.plugins = this.plugins.concat({ plugin, opts })
         return this
     }
 
 
     public middleware(middlewares: IReframeHandler[]) {
-        this.meta.middlewares = this.meta.middlewares.concat(middlewares)
+        this.middlewares = this.middlewares.concat(middlewares)
         return this
     }
 
 
-    public controllers(controllers: (new () => any)[]) {
+
+    public controller(controllers: (new () => any)[]) {
+        this.controllers = this.controllers.concat(controllers)
+        return this
+    }
+
+
+
+    private frameBuilder(options: IOptionStartEngine): IMetaReframe {
         let metaControllers: IController[] = []
 
 
-        for (const ClassController of controllers) {
-            const controller = new ClassController
+        for (const Blueprint of this.controllers) {
+            const instance = new Blueprint
             const routeHandlers: Array<IRouteHandler> = []
 
-            for (const keyProp of Reflect.ownKeys(ClassController.prototype)) {
-                const htttpMethod: IHttpMethod = Reflect.getMetadata('method', controller, keyProp)
-                const route: string = Reflect.getMetadata('route', controller, keyProp)
-                const handler = controller[keyProp]
+            for (const keyProp of Reflect.ownKeys(Blueprint.prototype)) {
+                const htttpMethod: IHttpMethod = Reflect.getMetadata('method', instance, keyProp)
+                const route: string = Reflect.getMetadata('route', instance, keyProp)
+                const handler = instance[keyProp]
 
                 if (htttpMethodAlloweds.includes(htttpMethod) && route && handler) {
                     routeHandlers.push({
                         htttpMethod,
                         handler,
-                        route
+                        route: String('/' + (options.prefix ?? '') + '/' + (Reflect.getMetadata('prefix', Blueprint) ?? '') + '/' + route)
+                            .replace(/[\\/]+/g, '/')
                     })
                 }
             }
 
             metaControllers.push({
-                prefix: Reflect.getMetadata('prefix', ClassController),
-                middlewares: Reflect.getMetadata('middlewares', ClassController),
+                middlewares: Reflect.getMetadata('middlewares', Blueprint),
                 routeHandlers
             })
         }
 
 
-        this.meta.controllers = this.meta.controllers.concat(metaControllers)
-        return this
+        return {
+            plugins: this.plugins,
+            middlewares: this.middlewares,
+            controllers: metaControllers
+        }
     }
 
 
     start(engine: (meta: IMetaReframe, options: IOptionStartEngine) => any, options?: IOptionStartEngine) {
-        engine(this.meta, options)
+        engine(this.frameBuilder(options), options)
     }
 }
 export default (new Reframe)

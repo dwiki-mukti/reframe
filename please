@@ -1,9 +1,8 @@
 const { program } = require('commander')
 
-require("./reframe/providers/prompts/controller/index")(program)
-require("./reframe/providers/prompts/service/index")(program)
-require("./reframe/providers/prompts/migration/index")(program)
-require("./reframe/providers/prompts/schema/index")(program)
+require("./reframe/providers/prompts/controller/index").call(program)
+require("./reframe/providers/prompts/migration/index").call(program)
+require("./reframe/providers/prompts/schema/index").call(program)
 
 program.parseAsync()
 

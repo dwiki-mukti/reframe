@@ -6,6 +6,6 @@ import FastifyEngine from "./reframe/engines/fastify";
 
 Reframe.middleware([
     TestMiddleware
-]).controllers([
+]).controller([
     UserController
 ]).start(FastifyEngine, { prefix: 'v1', port: 8000 })
