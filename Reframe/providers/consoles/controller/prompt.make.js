@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 
 async function handler(name) {
-    fs.readFile('reframe/providers/prompts/controller/prototype.ts', { encoding: 'utf-8' }, (err, data) => {
+    fs.readFile('reframe/providers/consoles/controller/stub.controller.ts', { encoding: 'utf-8' }, (err, data) => {
         if (err) throw err;
 
         // declare var

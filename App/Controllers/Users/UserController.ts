@@ -1,5 +1,4 @@
 
-import DB from "@/app/Databases/DB";
 import { Controller, Get, IReframeHandlerParams, Post } from "@/Reframe/providers/decorator";
 
 
@@ -72,19 +71,6 @@ class UserController {
         })
 
         return response.json(validated)
-    }
-
-    /** Test Connection */
-    @Get('/person')
-    async person({ response }: IReframeHandlerParams) {
-        const result = await DB.selectFrom('person')
-            .innerJoin('pet', 'pet.owner_id', 'person.id')
-            .select(['person.first_name as Nama Pemilik', 'pet.name as Pet', 'pet.species as Spesies'])
-            .execute();
-
-        return response.json({
-            data: result
-        })
     }
 }
 export default UserController

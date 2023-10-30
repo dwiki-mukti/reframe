@@ -1,26 +1,18 @@
-{
-    CLI: {
-        on make migration: [
-            add boilerplate migration,
-            add schema
-        ],
-        reframe make module: [
-            controller,
-            service
-        ]
-    },
-    add validator: [
-        nullable,
-        enum:opts1,opts2,
+## Info
 
-        min,
-        max,
-        length,
+```bash
+# Main console
+$ node please -h
 
-        exist:column,table,
-        unique:column,table,except,
+# Migration console
+$ yarn migration
 
-        extnames:docs,txt,
-        maxsize:2mb
-    ]
-}
+# Run dev mode (watch)
+$ yarn dev
+
+# Build production
+$ yarn build
+
+# Run on production
+$ yarn start
+```

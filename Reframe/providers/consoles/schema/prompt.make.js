@@ -1,9 +1,10 @@
 const fs = require('fs')
 const path = require('path');
-const { makeMigration } = require('../migration');
+const pluralize = require('pluralize');
+const { makeMigration } = require('../migration/prompt.make');
 
 async function handler(schemaName) {
-    fs.readFile('reframe/providers/prompts/schema/prototype.ts', { encoding: 'utf-8' }, (err, data) => {
+    fs.readFile('reframe/providers/consoles/schema/stub.schema.ts', { encoding: 'utf-8' }, (err, data) => {
         if (err) throw err;
 
         // declare var
@@ -41,7 +42,7 @@ exports.call = function (program) {
         .action(async (schemaName, options) => {
             await handler(schemaName)
             if (options?.migration) {
-                await makeMigration(schemaName)
+                await makeMigration(pluralize(schemaName))
             }
             process.exit
         })

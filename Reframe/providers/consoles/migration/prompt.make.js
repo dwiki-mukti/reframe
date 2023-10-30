@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 
 async function handler(tableName) {
-    fs.readFile('reframe/providers/prompts/migration/prototype.ts', { encoding: 'utf-8' }, (err, data) => {
+    fs.readFile('reframe/providers/consoles/migration/stub.migration.ts', { encoding: 'utf-8' }, (err, data) => {
         if (err) throw err;
 
         // declare var
@@ -32,9 +32,7 @@ exports.call = function (program) {
     program
         .command('make:migration')
         .argument('<name>')
-        .description(
-            'Make a new migration',
-        )
+        .description('Make a new migration')
         .action(async (tableName) => {
             await handler(tableName)
             process.exit
