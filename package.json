@@ -9,9 +9,11 @@
     "@fastify/cors": "^8.3.0",
     "@fastify/formbody": "^7.4.0",
     "@fastify/multipart": "^7.7.3",
+    "@hono/node-server": "^1.14.0",
     "commander": "^11.0.0",
     "dotenv": "^16.3.1",
     "fastify": "^4.22.0",
+    "hono": "^4.7.6",
     "kysely": "^0.26.3",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13"
